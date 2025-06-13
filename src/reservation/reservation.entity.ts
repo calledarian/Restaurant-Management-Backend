@@ -7,19 +7,26 @@ import {
     JoinColumn,
 } from 'typeorm';
 import { Table } from 'src/table/table.entity';
-
-export enum ReservationStatus {
-    PENDING = 'pending',
-    COMPLETED = 'completed',
-}
+import { IsInt, IsOptional, IsBoolean, IsString, Min, Max, IsPositive } from 'class-validator';
 
 export class CreateReservationDto {
-    table_id: string; // was: tableId: number;
+    @IsInt()
+    @IsPositive()
+    tableId: number;  // required table reference
+
+    @IsInt()
+    @Min(1)
+    @Max(10)  // assuming max party size is 20
     partySize: number;
-    status: ReservationStatus;
+
+    @IsOptional()
+    @IsBoolean()
+    isServed?: boolean;  // optional, defaults to false
+
+    @IsOptional()
+    @IsString()
     reservedBy?: string;
 }
-
 
 @Entity('reservations')
 export class Reservation {
@@ -27,14 +34,14 @@ export class Reservation {
     id: number;
 
     @ManyToOne(() => Table, table => table.reservations, { eager: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'table_id' }) // links the FK column name to the `Table` entity
+    @JoinColumn({ name: 'tableId' })
     table: Table;
 
     @Column()
     partySize: number;
 
-    @Column({ type: 'enum', enum: ReservationStatus, default: ReservationStatus.PENDING })
-    status: ReservationStatus;
+    @Column({ type: 'boolean', default: false })
+    isServed: boolean;  // false = pending, true = served
 
     @Column({ nullable: true })
     reservedBy: string;

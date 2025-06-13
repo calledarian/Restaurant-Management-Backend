@@ -1,43 +1,41 @@
 import { Controller, Get, Post, Param, Body, Patch, Delete, ParseIntPipe } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
-import { CreateReservationDto, Reservation, ReservationStatus } from './reservation.entity';
-import { Table } from 'src/table/table.entity';
+import { CreateReservationDto } from './reservation.entity';
 
-@Controller('/reservations')
+@Controller('reservations')
 export class ReservationController {
     constructor(private readonly reservationService: ReservationService) { }
 
+    // Get all reservations
     @Get()
-    findAll(): Promise<Reservation[]> {
-        return this.reservationService.findAll();
+    findAll() {
+        return this.reservationService.findAllActiveReservations();
     }
 
+    // Get a single reservation by ID
     @Get(':id')
-    findOne(@Param('id') id: string): Promise<Reservation> {
-        return this.reservationService.findOne(Number(id));
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.reservationService.findOneByReservaionId(id);
     }
 
-    @Get('available')
-    async availableReservations(): Promise<Table[]> {
-        return this.reservationService.availableReservations();
-    }
-
-
+    // Create a new reservation
     @Post()
-    createReservation(@Body() reservationInfo: CreateReservationDto): Promise<Reservation> {
-        return this.reservationService.createReservation(reservationInfo);
+    create(@Body() dto: CreateReservationDto) {
+        return this.reservationService.createReservation(dto);
     }
 
-    @Patch(':id/status')
-    async updateReservationStatus(
+    // Update the isServed status of a reservation
+    @Patch(':id')
+    updateStatus(
         @Param('id', ParseIntPipe) id: number,
-        @Body('status') status: ReservationStatus,
+        @Body('isServed') isServed: boolean,
     ) {
-        return await this.reservationService.updateReservationStatus(id, status);
+        return this.reservationService.updateStatus(id, isServed);
     }
 
+    // Delete a reservation
     @Delete(':id')
-    remove(@Param('id') id: string): Promise<void> {
-        return this.reservationService.remove(Number(id));
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.reservationService.remove(id);
     }
 }

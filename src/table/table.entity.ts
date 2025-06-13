@@ -1,37 +1,29 @@
 import { Reservation } from 'src/reservation/reservation.entity';
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     OneToMany,
     Index,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum TableStatus {
-    AVAILABLE = 'available',
-    RESERVED = 'reserved',
-}
 
 @Entity('tables')
 export class Table {
+    @Index()
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Index()
-    @Column({ unique: true })
-    table_id: string; // e.g., "T01", "T02"
-
-    @Column()
+    @Column({ type: 'int', default: 4 })
     capacity: number;
 
     @Index()
-    @Column({ type: 'enum', enum: TableStatus, default: TableStatus.AVAILABLE })
-    status: TableStatus;
+    @Column({ type: 'boolean', default: true })
+    isAvailable: boolean;  // true = available, false = reserved/occupied
 
     @Index()
     @Column({ nullable: true })
     location: string;
 
-    @OneToMany(() => Reservation, reservation => reservation.table, { cascade: true })
+    @OneToMany(() => Reservation, reservation => reservation.table, { cascade: ['remove'] })
     reservations: Reservation[];
 }

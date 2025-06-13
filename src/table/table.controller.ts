@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Param, Body, Patch, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Patch, Delete, BadRequestException, ParseIntPipe } from '@nestjs/common';
 import { TableService } from './table.service';
-import { Table, TableStatus } from './table.entity';
+import { Table } from './table.entity';
 
 @Controller('/tables')
 export class TableController {
@@ -26,21 +26,21 @@ export class TableController {
         return this.tableService.update(Number(id), tableInfo);
     }
 
-    @Patch(':table_id/status')
-    async updateTableStatus(
+    @Patch(':id/availability')
+    async updateTableAvailability(
         @Param('table_id') table_id: string,
-        @Body('status') status: TableStatus,
+        @Body('isAvailable') isAvailable: Table['isAvailable'],
     ) {
         const numericTableId = Number(table_id);
         if (isNaN(numericTableId)) {
             throw new BadRequestException('Invalid table ID');
         }
-        return await this.tableService.updateTableStatus(numericTableId, status);
+        return await this.tableService.updateTableAvailability(numericTableId, isAvailable);
     }
 
 
     @Delete(':id')
-    remove(@Param('id') id: string): Promise<void> {
-        return this.tableService.remove(Number(id));
+    remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+        return this.tableService.remove((id));
     }
 }
