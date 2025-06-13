@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { CreateReservationDto, Reservation, ReservationStatus } from './reservation.entity';
-import { Table } from 'src/table/table.entity';
+import { Table, TableStatus } from 'src/table/table.entity';
 
 @Injectable()
 export class ReservationService {
@@ -26,43 +26,74 @@ export class ReservationService {
         return reservation;
     }
 
-    async create(data: CreateReservationDto): Promise<Reservation> {
-        const table = await this.tableRepository.findOne({ where: { id: data.tableId } });
-        if (!table) {
-            throw new NotFoundException(`Table ${data.tableId} not found`);
-        }
-
-        const reservation = this.reservationRepository.create({
-            table,
-            partySize: data.partySize,
-            startTime: data.startTime,
-            endTime: data.endTime,
-            status: data.status || ReservationStatus.PENDING,
-            note: data.note,
-            reservedBy: data.reservedBy,
+    async availableReservations(): Promise<Table[]> {
+        const activeReservations = await this.reservationRepository.find({
+            where: { status: ReservationStatus.PENDING },
+            relations: ['table'],
         });
 
-        return this.reservationRepository.save(reservation);
+        // Safely extract table IDs
+        const reservedTableIds = activeReservations
+            .map(reservation => reservation.table?.id)
+            .filter((id): id is number => typeof id === 'number' && !isNaN(id));
+
+        return this.tableRepository.find({
+            where: reservedTableIds.length
+                ? { id: Not(In(reservedTableIds)) }
+                : {}, // if no reserved tables, return all
+        });
+    }
+
+    async createReservation(dto: CreateReservationDto): Promise<Reservation> {
+        // Find the table by its ID
+        const table = await this.tableRepository.findOne({ where: { table_id: dto.table_id } });
+
+        if (!table) {
+            throw new NotFoundException('Table not found');
+        }
+
+        // Set the table status based on reservation status
+        if (dto.status === ReservationStatus.COMPLETED) {
+            table.status = TableStatus.AVAILABLE;
+        } else {
+            table.status = TableStatus.RESERVED;
+        }
+
+        // Save the updated table status
+        await this.tableRepository.save(table);
+
+        // Create and save the reservation
+        const reservation = this.reservationRepository.create({
+            ...dto,
+            table,
+        });
+
+        return await this.reservationRepository.save(reservation);
     }
 
 
-    async update(id: number, updateData: Partial<Reservation>): Promise<Reservation> {
-        const reservation = await this.reservationRepository.findOne({ where: { id } });
+    async updateReservationStatus(id: number, status: ReservationStatus): Promise<Reservation> {
+        const reservation = await this.reservationRepository.findOne({
+            where: { id },
+            relations: ['table'],
+        });
+
         if (!reservation) {
-            throw new NotFoundException(`Reservation ${id} not found`);
+            throw new NotFoundException('Reservation not found');
         }
 
-        if (updateData.table && typeof updateData.table === 'number') {
-            const table = await this.tableRepository.findOne({ where: { id: updateData.table } });
-            if (!table) {
-                throw new NotFoundException(`Table ${updateData.table} not found`);
-            }
-            reservation.table = table;
+        reservation.status = status;
+
+        if (status === ReservationStatus.COMPLETED) {
+            reservation.table.status = TableStatus.AVAILABLE;
+        } else {
+            reservation.table.status = TableStatus.RESERVED;
         }
 
-        Object.assign(reservation, updateData);
-        return this.reservationRepository.save(reservation);
+        await this.tableRepository.save(reservation.table);
+        return await this.reservationRepository.save(reservation);
     }
+
 
     async remove(id: number): Promise<void> {
         const result = await this.reservationRepository.delete(id);

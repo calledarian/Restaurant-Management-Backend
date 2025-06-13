@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Table } from './table.entity';
+import { Table, TableStatus } from './table.entity';
 
 @Injectable()
 export class TableService {
@@ -34,6 +34,17 @@ export class TableService {
             throw new NotFoundException(`Table with ID ${id} not found`);
         }
         return updated;
+    }
+
+    async updateTableStatus(table_id: number, status: TableStatus): Promise<Table> {
+        const table = await this.tableRepository.findOne({ where: { id: table_id } });
+
+        if (!table) {
+            throw new NotFoundException('Table not found');
+        }
+
+        table.status = status;
+        return await this.tableRepository.save(table);
     }
 
     async remove(id: number): Promise<void> {

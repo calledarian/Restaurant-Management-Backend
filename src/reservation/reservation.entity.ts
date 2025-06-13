@@ -1,45 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    ManyToOne,
+    CreateDateColumn,
+    JoinColumn,
+} from 'typeorm';
 import { Table } from 'src/table/table.entity';
 
 export enum ReservationStatus {
     PENDING = 'pending',
-    CONFIRMED = 'confirmed',
-    CANCELLED = 'cancelled',
     COMPLETED = 'completed',
 }
 
 export class CreateReservationDto {
-    tableId: number;
+    table_id: string; // was: tableId: number;
     partySize: number;
-    startTime: Date;
-    endTime: Date;
-    status?: ReservationStatus;
-    note?: string;
+    status: ReservationStatus;
     reservedBy?: string;
 }
+
 
 @Entity('reservations')
 export class Reservation {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => Table, table => table.reservations, { eager: true })
+    @ManyToOne(() => Table, table => table.reservations, { eager: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'table_id' }) // links the FK column name to the `Table` entity
     table: Table;
 
     @Column()
     partySize: number;
 
-    @Column('timestamp')
-    startTime: Date;
-
-    @Column('timestamp')
-    endTime: Date;
-
     @Column({ type: 'enum', enum: ReservationStatus, default: ReservationStatus.PENDING })
     status: ReservationStatus;
-
-    @Column({ type: 'text', nullable: true })
-    note: string;
 
     @Column({ nullable: true })
     reservedBy: string;

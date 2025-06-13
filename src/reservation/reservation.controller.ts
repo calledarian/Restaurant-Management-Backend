@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Param, Body, Patch, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Patch, Delete, ParseIntPipe } from '@nestjs/common';
 import { ReservationService } from './reservation.service';
-import { CreateReservationDto, Reservation } from './reservation.entity';
+import { CreateReservationDto, Reservation, ReservationStatus } from './reservation.entity';
+import { Table } from 'src/table/table.entity';
 
-@Controller('reservations')
+@Controller('/reservations')
 export class ReservationController {
     constructor(private readonly reservationService: ReservationService) { }
 
@@ -16,17 +17,23 @@ export class ReservationController {
         return this.reservationService.findOne(Number(id));
     }
 
-    @Post()
-    create(@Body() reservationInfo: CreateReservationDto): Promise<Reservation> {
-        return this.reservationService.create(reservationInfo);
+    @Get('available')
+    async availableReservations(): Promise<Table[]> {
+        return this.reservationService.availableReservations();
     }
 
-    @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() reservationInfo: Partial<Reservation>,
-    ): Promise<Reservation> {
-        return this.reservationService.update(Number(id), reservationInfo);
+
+    @Post()
+    createReservation(@Body() reservationInfo: CreateReservationDto): Promise<Reservation> {
+        return this.reservationService.createReservation(reservationInfo);
+    }
+
+    @Patch(':id/status')
+    async updateReservationStatus(
+        @Param('id', ParseIntPipe) id: number,
+        @Body('status') status: ReservationStatus,
+    ) {
+        return await this.reservationService.updateReservationStatus(id, status);
     }
 
     @Delete(':id')
