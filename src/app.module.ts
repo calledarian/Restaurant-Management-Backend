@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TableModule } from './table/table.module';
 import { ReservationModule } from './reservation/reservation.module';
+import { MenuItemModule } from './menu-item/menu-item.module';
+import { OrderItemModule } from './order-item/order-item.module';
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -21,6 +23,8 @@ import { ReservationModule } from './reservation/reservation.module';
   }),
     TableModule,
     ReservationModule,
+    MenuItemModule,
+    OrderItemModule,
   ],
   controllers: [AppController],
   providers: [AppService],

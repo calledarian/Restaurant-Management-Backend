@@ -5,9 +5,11 @@ import {
     ManyToOne,
     CreateDateColumn,
     JoinColumn,
+    OneToMany,
 } from 'typeorm';
 import { Table } from 'src/table/table.entity';
 import { IsInt, IsOptional, IsBoolean, IsString, Min, Max, IsPositive } from 'class-validator';
+import { OrderItem } from 'src/order-item/order-item.entity';
 
 export class CreateReservationDto {
     @IsInt()
@@ -36,6 +38,10 @@ export class Reservation {
     @ManyToOne(() => Table, table => table.reservations, { eager: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'tableId' })
     table: Table;
+
+    @OneToMany(() => OrderItem, orderItem => orderItem.reservation, { eager: true })
+    orderItems: OrderItem[];
+
 
     @Column()
     partySize: number;
