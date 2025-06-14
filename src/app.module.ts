@@ -3,10 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TableModule } from './table/table.module';
-import { ReservationModule } from './reservation/reservation.module';
-import { MenuItemModule } from './menu-item/menu-item.module';
-import { OrderItemModule } from './order-item/order-item.module';
+
 
 @Module({
   imports: [ConfigModule.forRoot(),
@@ -21,10 +18,7 @@ import { OrderItemModule } from './order-item/order-item.module';
     synchronize: true,
 
   }),
-    TableModule,
-    ReservationModule,
-    MenuItemModule,
-    OrderItemModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
