@@ -3,6 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TableModule } from './table/table.module';
+import { SessionModule } from './session/session.module';
+import { OrderItemModule } from './order-item/order-item.module';
+import { MenuItemModule } from './menu-item/menu-item.module';
 
 
 @Module({
@@ -18,6 +22,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     synchronize: true,
 
   }),
+    TableModule,
+    SessionModule,
+    OrderItemModule,
+    MenuItemModule,
 
   ],
   controllers: [AppController],
