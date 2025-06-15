@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsString, IsNumber, Min, IsOptional, IsBoolean } from 'class-validator';
+import { OrderItem } from 'src/order-item/order-item.entity';
 
 export class CreateMenuItemDto {
     @IsString()
@@ -28,5 +29,9 @@ export class MenuItem {
 
     @Column({ nullable: true })
     description?: string; // optional
+
+    @OneToMany(() => OrderItem, order => order.menuItem, { cascade: true })
+    orderItems: OrderItem[];
+
 
 }

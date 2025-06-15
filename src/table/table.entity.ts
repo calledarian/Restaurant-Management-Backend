@@ -1,5 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IsInt, Min } from 'class-validator';
+import { Session } from '../session/session.entity';
+
 
 export class CreateTableDto {
     @IsInt()
@@ -14,5 +16,9 @@ export class Table {
     id: number;
 
     @Column({ type: 'int' })
-    capacity: number; // Maximum number of guests this table can seat
+    capacity: number;
+
+    @OneToMany(() => Session, (session) => session.table)
+    sessions: Session[];
+
 }
