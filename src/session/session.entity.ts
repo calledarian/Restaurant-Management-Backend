@@ -9,6 +9,9 @@ export class CreateSessionDto {
     @IsNumber()
     tableId: number;
 
+    @IsNumber()
+    partySize: number;
+
     @ValidateNested({ each: true })
     @Type(() => CreateOrderItemDto)
     @ArrayMinSize(1)
