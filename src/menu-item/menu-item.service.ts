@@ -11,7 +11,7 @@ export class MenuItemService {
     ) { }
 
     async findAll(): Promise<MenuItem[]> {
-        return this.menuItemRepository.find()''
+        return this.menuItemRepository.find();
     }
 
     async findOne(id: number): Promise<MenuItem> {

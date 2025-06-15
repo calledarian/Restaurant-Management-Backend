@@ -4,9 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderItem } from '../order-item/order-item.entity';
 import { SessionController } from './session.controller';
 import { Table } from 'src/table/table.entity';
+import { Session } from './session.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderItem, Table])],
+  imports: [TypeOrmModule.forFeature([Session, OrderItem, Table])],
   controllers: [SessionController],
   providers: [SessionService],
 })
