@@ -25,7 +25,7 @@ export class MenuItemController {
     @Patch(':id')
     update(
         @Param('id', ParseIntPipe) id: number,
-        @Body() updateMenuItemDto: CreateMenuItemDto,
+        @Body() updateMenuItemDto: Partial<CreateMenuItemDto>,
     ) {
         return this.menuItemService.update(id, updateMenuItemDto);
     }

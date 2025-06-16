@@ -27,7 +27,7 @@ export class MenuItemService {
         return this.menuItemRepository.save(menuItem);
     }
 
-    async update(id: number, updateMenuItemDto: CreateMenuItemDto): Promise<MenuItem> {
+    async update(id: number, updateMenuItemDto: Partial<CreateMenuItemDto>): Promise<MenuItem> {
         await this.findOne(id); // Check if exists
         await this.menuItemRepository.update(id, updateMenuItemDto);
         return this.findOne(id);

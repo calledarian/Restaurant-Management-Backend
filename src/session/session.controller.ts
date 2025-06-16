@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from "@nestjs/common";
-import { CreateSessionDto } from "./session.entity";
+import { CreateSessionDto, UpdateSessionDto } from "./session.entity";
 import { SessionService } from "./session.service";
 
 @Controller('sessions')
@@ -27,10 +27,10 @@ export class SessionController {
     }
 
     @Patch(':id')
-    update(
+    patchAsComplete(
         @Param('id', ParseIntPipe) id: number,
-        @Body() updateSessionDto: CreateSessionDto,
+        @Body() updateSessionDto: UpdateSessionDto,
     ) {
-        return this.sessionService.update(id, updateSessionDto);
+        return this.sessionService.patchAsComplete(id, updateSessionDto);
     }
 }
