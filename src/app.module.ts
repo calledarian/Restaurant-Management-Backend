@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TableModule } from './table/table.module';
 import { SessionModule } from './session/session.module';
-import { OrderItemModule } from './order-item/order-item.module';
 import { MenuItemModule } from './menu-item/menu-item.module';
 
 
@@ -24,7 +23,6 @@ import { MenuItemModule } from './menu-item/menu-item.module';
   }),
     TableModule,
     SessionModule,
-    OrderItemModule,
     MenuItemModule,
 
   ],
